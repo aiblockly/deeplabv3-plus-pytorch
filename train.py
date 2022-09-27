@@ -1,3 +1,23 @@
+INI_PATH = "config.ini"
+import configparser
+
+config = configparser.ConfigParser()
+config.read("config.ini")
+FROZEN_BATCH_SIZE = config["base"].getint("frozen_batch-size")
+UNFROZEN_BATCH_SIZE = config["base"].getint("unfrozen_batch-size")
+FROZEN_EPOCH = config["base"].getint("frozen_epoch")
+UNFROZEN_EPOCH = config["base"].getint("unfrozen_epoch")
+IMGSZ = config["base"].getint("image_size")
+FP16_ENABLE = config["base"].getboolean("fp16")
+DATASET_PATH = config["base"].get("dataset_path")
+SAVE_PATH = config["base"].get("save_path")
+BACKBONE = config["base"].get("backbone")
+NUM_CLASSES = config["base"].getint("num_cleases")
+
+INIT_LR=config["advance"].getfloat("init_lr")
+MIN_LR_MULTIPLY=config["advance"].getfloat("min_lr_mutliply")
+DOWNSAMPLE_FACTOR=config["advance"].getint("downsample_factor")
+exit(0)
 import os
 import datetime
 
@@ -62,18 +82,18 @@ if __name__ == "__main__":
     #   fp16        是否使用混合精度训练
     #               可减少约一半的显存、需要pytorch1.7.1以上
     #---------------------------------------------------------------------#
-    fp16            = False
+    fp16            = FP16_ENABLE
     #-----------------------------------------------------#
     #   num_classes     训练自己的数据集必须要修改的
     #                   自己需要的分类个数+1，如2+1
     #-----------------------------------------------------#
-    num_classes     = 21
+    num_classes     = NUM_CLASSES
     #---------------------------------#
     #   所使用的的主干网络：
     #   mobilenet
     #   xception
     #---------------------------------#
-    backbone        = "mobilenet"
+    backbone        = BACKBONE
     #----------------------------------------------------------------------------------------------------------------------------#
     #   pretrained      是否使用主干网络的预训练权重，此处使用的是主干的权重，因此是在模型构建的时候进行加载的。
     #                   如果设置了model_path，则主干的权值无需加载，pretrained的值无意义。
@@ -105,11 +125,11 @@ if __name__ == "__main__":
     #                       8下采样的倍数较小、理论上效果更好。
     #                       但也要求更大的显存
     #---------------------------------------------------------#
-    downsample_factor   = 16
+    downsample_factor   = DOWNSAMPLE_FACTOR
     #------------------------------#
     #   输入图片的大小
     #------------------------------#
-    input_shape         = [512, 512]
+    input_shape         = [IMGSZ, IMGSZ]
     
     #----------------------------------------------------------------------------------------------------------------------------#
     #   训练分为两个阶段，分别是冻结阶段和解冻阶段。设置冻结阶段是为了满足机器性能不足的同学的训练需求。
@@ -153,8 +173,8 @@ if __name__ == "__main__":
     #                       (当Freeze_Train=False时失效)
     #------------------------------------------------------------------#
     Init_Epoch          = 0
-    Freeze_Epoch        = 50
-    Freeze_batch_size   = 8
+    Freeze_Epoch        = FROZEN_EPOCH
+    Freeze_batch_size   = FROZEN_BATCH_SIZE
     #------------------------------------------------------------------#
     #   解冻阶段训练参数
     #   此时模型的主干不被冻结了，特征提取网络会发生改变
@@ -162,8 +182,8 @@ if __name__ == "__main__":
     #   UnFreeze_Epoch          模型总共训练的epoch
     #   Unfreeze_batch_size     模型在解冻后的batch_size
     #------------------------------------------------------------------#
-    UnFreeze_Epoch      = 100
-    Unfreeze_batch_size = 4
+    UnFreeze_Epoch      = UNFROZEN_EPOCH
+    Unfreeze_batch_size = UNFROZEN_BATCH_SIZE
     #------------------------------------------------------------------#
     #   Freeze_Train    是否进行冻结训练
     #                   默认先冻结主干训练后解冻训练。
@@ -179,8 +199,8 @@ if __name__ == "__main__":
     #                   当使用SGD优化器时建议设置   Init_lr=7e-3
     #   Min_lr          模型的最小学习率，默认为最大学习率的0.01
     #------------------------------------------------------------------#
-    Init_lr             = 7e-3
-    Min_lr              = Init_lr * 0.01
+    Init_lr             = INIT_LR
+    Min_lr              = Init_lr * MIN_LR_MULTIPLY
     #------------------------------------------------------------------#
     #   optimizer_type  使用到的优化器种类，可选的有adam、sgd
     #                   当使用Adam优化器时建议设置  Init_lr=5e-4
@@ -203,7 +223,7 @@ if __name__ == "__main__":
     #------------------------------------------------------------------#
     #   save_dir        权值与日志文件保存的文件夹
     #------------------------------------------------------------------#
-    save_dir            = 'logs'
+    save_dir            = SAVE_PATH
     #------------------------------------------------------------------#
     #   eval_flag       是否在训练时进行评估，评估对象为验证集
     #   eval_period     代表多少个epoch评估一次，不建议频繁的评估
@@ -218,7 +238,7 @@ if __name__ == "__main__":
     #------------------------------------------------------------------#
     #   VOCdevkit_path  数据集路径
     #------------------------------------------------------------------#
-    VOCdevkit_path  = 'VOCdevkit'
+    VOCdevkit_path  = DATASET_PATH
     #------------------------------------------------------------------#
     #   建议选项：
     #   种类少（几类）时，设置为True
