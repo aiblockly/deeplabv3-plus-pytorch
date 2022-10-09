@@ -1,6 +1,7 @@
 INI_PATH = "config.ini"
 import configparser
-
+import sys,os
+sys.path.append(os.getcwd())
 config = configparser.ConfigParser()
 config.read("config.ini")
 FROZEN_BATCH_SIZE = config["base"].getint("frozen_batch-size")
