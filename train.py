@@ -17,7 +17,6 @@ NUM_CLASSES = config["base"].getint("num_cleases")
 INIT_LR=config["advance"].getfloat("init_lr")
 MIN_LR_MULTIPLY=config["advance"].getfloat("min_lr_mutliply")
 DOWNSAMPLE_FACTOR=config["advance"].getint("downsample_factor")
-exit(0)
 import os
 import datetime
 
