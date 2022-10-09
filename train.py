@@ -13,7 +13,7 @@ FP16_ENABLE = config["base"].getboolean("fp16")
 DATASET_PATH = config["base"].get("dataset_path")
 SAVE_PATH = config["base"].get("save_path")
 BACKBONE = config["base"].get("backbone")
-NUM_CLASSES = config["base"].getint("num_cleases")
+NUM_CLASSES = config["base"].getint("num_classes")
 
 INIT_LR=config["advance"].getfloat("init_lr")
 MIN_LR_MULTIPLY=config["advance"].getfloat("min_lr_mutliply")
