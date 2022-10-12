@@ -2,6 +2,26 @@
 #   将单张图片预测、摄像头检测和FPS测试功能
 #   整合到了一个py文件中，通过指定mode进行模式的修改。
 #----------------------------------------------------#
+INI_PATH = "config.ini"
+import configparser
+import sys,os
+sys.path.append(os.getcwd())
+config = configparser.ConfigParser()
+config.read("config.ini")
+FROZEN_BATCH_SIZE = config["base"].getint("frozen_batch-size")
+UNFROZEN_BATCH_SIZE = config["base"].getint("unfrozen_batch-size")
+FROZEN_EPOCH = config["base"].getint("frozen_epoch")
+UNFROZEN_EPOCH = config["base"].getint("unfrozen_epoch")
+IMGSZ = config["base"].getint("image_size")
+FP16_ENABLE = config["base"].getboolean("fp16")
+DATASET_PATH = config["base"].get("dataset_path")
+SAVE_PATH = config["base"].get("save_path")
+BACKBONE = config["base"].get("backbone")
+NUM_CLASSES = config["base"].getint("num_classes")
+
+INIT_LR=config["advance"].getfloat("init_lr")
+MIN_LR_MULTIPLY=config["advance"].getfloat("min_lr_mutliply")
+DOWNSAMPLE_FACTOR=config["advance"].getint("downsample_factor")
 import time
 
 import cv2
@@ -14,7 +34,9 @@ if __name__ == "__main__":
     #-------------------------------------------------------------------------#
     #   如果想要修改对应种类的颜色，到__init__函数里修改self.colors即可
     #-------------------------------------------------------------------------#
-    deeplab = DeeplabV3()
+    MODEL_PATH=os.path.join(SAVE_PATH,"best_epoch_weights.pth")
+    deeplab = DeeplabV3(num_classes=NUM_CLASSES,backbone=BACKBONE,model_path=MODEL_PATH,
+    input_shape=[IMGSZ,IMGSZ],downsample_factor=DOWNSAMPLE_FACTOR)
     #----------------------------------------------------------------------------------------------------------#
     #   mode用于指定测试的模式：
     #   'predict'           表示单张图片预测，如果想对预测过程进行修改，如保存图片，截取对象等，可以先看下方详细的注释
@@ -23,7 +45,7 @@ if __name__ == "__main__":
     #   'dir_predict'       表示遍历文件夹进行检测并保存。默认遍历img文件夹，保存img_out文件夹，详情查看下方注释。
     #   'export_onnx'       表示将模型导出为onnx，需要pytorch1.7.1以上。
     #----------------------------------------------------------------------------------------------------------#
-    mode = "predict"
+    mode = "export_onnx"
     #-------------------------------------------------------------------------#
     #   count               指定了是否进行目标的像素点计数（即面积）与比例计算
     #   name_classes        区分的种类，和json_to_dataset里面的一样，用于打印种类和数量
